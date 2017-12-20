@@ -9,11 +9,11 @@ export const search = () => {
 export async function searchItunes () {
     let isbn = store.getState().isbn;
     let url = `https://itunes.apple.com/lookup?isbn=${isbn}`;
-    let responseItune;
+    let responseItunes;
     await fetch(url)
     .then(res => res.json())
     .then((out) => {
-        responseItune = {
+        responseItunes = {
             price : out.results[0].price,
             img : out.results[0].artworkUrl100,
             title : out.results[0].trackCensoredName,
@@ -22,12 +22,12 @@ export async function searchItunes () {
             ituneUrl : out.results[0].trackViewUrl 
         }
         store.setState({
-            itunes : responseItune
+            itunes : responseItunes
         })
         console.log('Checkout this JSON! ', out);
     });
     if(store.getState().itunes != null ){
-        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(store.getState().itunes);
+        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(responseItunes);
         console.log('price2', store.getState().itunes);
     }
 }
@@ -35,11 +35,11 @@ export async function searchItunes () {
 export async function searchGoogleBooks () {
     let isbn = store.getState().isbn;
     let url = `https://www.googleapis.com/books/v1/volumes?q=search+${isbn}`;
-    let responseItune;
+    let responseGoogle;
     await fetch(url)
     .then(res => res.json())
     .then((out) => {
-        responseItune = {
+        responseGoogle = {
             price : out.items[0].saleInfo.listPrice.amount,
             img : out.items[0].volumeInfo.imageLinks.thumbnail,
             title : out.items[0].volumeInfo.title,
@@ -48,43 +48,14 @@ export async function searchGoogleBooks () {
             ituneUrl : out.items[0].saleInfo.buyLink, 
         }
         store.setState({
-            googleBooks : responseItune
+            googleBooks : responseGoogle
         })
         console.log('Checkout this JSON! ', out);
     });
     if(store.getState().googleBooks != null ){
+        firebase.database().ref('books/' + store.getState().isbn + '/google/').set(responseGoogle);
         console.log('pricegoogle', store.getState().googleBooks);
     }
 }
 
-
-
-// async function toJson(param) {
-//     return fetch(param)
-//     .then(res => res.json())
-//     .then (res => {
-//         return {
-//             price : res.results[0].price,
-//             img : res.results[0].artworkUrl100,
-//             title : res.results[0].trackCensoredName,
-//             author : res.results[0].artistName,
-//             description : res.results[0].description, 
-//             ituneUrl : res.results[0].trackViewUrl           
-//         };
-//     })
-// }
-
-// export async function search() {
-//     let isbn = store.getState().isbn;
-//     let url = `https://itunes.apple.com/lookup?isbn=${isbn}`;
-//     const res = await fetch(url).then(result => result.json());
-//     const list = await getBook(res.results);
-//     store.setState({
-//         items : list
-//     })
-// }
-
-// function getBook(list) {
-//   return Promise.all(list.map(planet => toJson(planet)))
-// }
 

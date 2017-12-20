@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {searchItunes} from '../Actions/Actions';
+import {search} from '../Actions/Actions';
 import {Form, FormGroup, Col, Button, FormControl} from 'react-bootstrap';
 
 export const Search = () => {
@@ -7,7 +7,7 @@ export const Search = () => {
         e.preventDefault();
         if(this.isbnSearch.value) {
             console.log(this.isbnSearch.value);
-            searchItunes();
+            search();
         }
     } 
     return (

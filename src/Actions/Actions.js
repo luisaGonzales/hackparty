@@ -1,6 +1,11 @@
 import store from '../Store/Store';
 import firebase, {auth, database} from './Firebase.js';
 
+export const search = () => {
+    searchItunes();
+    searchGoogleBooks();
+}
+
 export async function searchItunes () {
     let isbn = store.getState().isbn;
     let url = `https://itunes.apple.com/lookup?isbn=${isbn}`;
@@ -24,6 +29,31 @@ export async function searchItunes () {
     if(store.getState().itunes != null ){
         firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(store.getState().itunes);
         console.log('price2', store.getState().itunes);
+    }
+}
+
+export async function searchGoogleBooks () {
+    let isbn = store.getState().isbn;
+    let url = `https://www.googleapis.com/books/v1/volumes?q=search+${isbn}`;
+    let responseItune;
+    await fetch(url)
+    .then(res => res.json())
+    .then((out) => {
+        responseItune = {
+            price : out.items[0].saleInfo.listPrice.amount,
+            img : out.items[0].volumeInfo.imageLinks.thumbnail,
+            title : out.items[0].volumeInfo.title,
+            author : out.items[0].volumeInfo.authors[0],
+            description : out.items[0].searchInfo.textSnippet, 
+            ituneUrl : out.items[0].saleInfo.buyLink, 
+        }
+        store.setState({
+            googleBooks : responseItune
+        })
+        console.log('Checkout this JSON! ', out);
+    });
+    if(store.getState().googleBooks != null ){
+        console.log('pricegoogle', store.getState().googleBooks);
     }
 }
 

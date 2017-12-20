@@ -1,4 +1,5 @@
 import firebase, {auth, database} from './Firebase.js';
+import store from '../Store/Store';
 
 export const saveIsbn = (isbn) => {
     store.setState({

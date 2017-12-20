@@ -1,6 +1,13 @@
 import store from '../Store/Store';
 import firebase, {auth, database} from './Firebase.js';
 
+export const saveIsbn = (isbn) => {
+    store.setState({
+        isbn : parseInt(isbn)
+    });
+    getBooks();
+}
+
 export const search = () => {
     searchItunes();
     searchGoogleBooks();
@@ -39,23 +46,50 @@ export async function searchGoogleBooks () {
     await fetch(url)
     .then(res => res.json())
     .then((out) => {
-        responseGoogle = {
-            price : out.items[0].saleInfo.listPrice.amount,
-            img : out.items[0].volumeInfo.imageLinks.thumbnail,
-            title : out.items[0].volumeInfo.title,
-            author : out.items[0].volumeInfo.authors[0],
-            description : out.items[0].searchInfo.textSnippet, 
-            ituneUrl : out.items[0].saleInfo.buyLink, 
+        if (out.items){
+            responseGoogle = {
+                price : out.items[0].saleInfo.listPrice.amount,
+                img : out.items[0].volumeInfo.imageLinks.thumbnail,
+                title : out.items[0].volumeInfo.title,
+                author : out.items[0].volumeInfo.authors[0],
+                description : out.items[0].searchInfo.textSnippet, 
+                ituneUrl : out.items[0].saleInfo.buyLink, 
+            }
+            store.setState({
+                googleBooks : responseGoogle
+            })
+        } else {
+            firebase.database().ref('books/' + store.getState().isbn + '/google/').set("No disponible en Google")
         }
-        store.setState({
-            googleBooks : responseGoogle
-        })
         console.log('Checkout this JSON! ', out);
-    });
+    })
+    .catch(
+        firebase.database().ref('books/' + store.getState().isbn + '/google/').set("No disponible en Google")
+    );
     if(store.getState().googleBooks != null ){
         firebase.database().ref('books/' + store.getState().isbn + '/google/').set(responseGoogle);
         console.log('pricegoogle', store.getState().googleBooks);
     }
 }
+
+export const getBooks = () => {
+    database.ref ('books/' + store.getState().isbn).once ('value').then ( res => {
+        const getFullInfo = res.val(); 
+        console.log ('full info ', getFullInfo);
+        store.setState ({
+          book: {
+            itunes :  getFullInfo.itunes,
+            google : getFullInfo.google,          
+          }
+        });
+        console.log("SIuser", store.getState().book);
+    })
+    .catch(
+        search()
+    );
+}
+
+
+
 
 

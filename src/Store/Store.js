@@ -2,9 +2,8 @@ import createStore from 'redux-zero';
 
 const initialState = {
     title : "Hackparty", 
-    isbn : 9781784975159, 
-    itunes: null,
-    googleBooks: null,
+    isbn : null, 
+    book : null,
 }
 
 const store = createStore(initialState);

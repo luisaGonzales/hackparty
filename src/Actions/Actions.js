@@ -6,15 +6,21 @@ export const saveIsbn = (isbn) => {
         isbn : parseInt(isbn)
     });
     getBooks();
+    console.log("arr", store.getState().arr.length);
+
 }
 
 export const search = () => {
-    searchItunes();
-    searchGoogleBooks();
+
+    store.getState().arr.map((isbn) => {
+        searchItunes(isbn);
+        searchGoogleBooks(isbn);
+    })
+ 
 }
 
-export async function searchItunes () {
-    let isbn = store.getState().isbn;
+export async function searchItunes (searchIsbn) {
+    let isbn = searchIsbn;
     let url = `https://itunes.apple.com/lookup?isbn=${isbn}`;
     let responseItunes;
     await fetch(url)
@@ -28,25 +34,25 @@ export async function searchItunes () {
             description : out.results[0].description, 
             ituneUrl : out.results[0].trackViewUrl 
         }
-        store.setState({
-            itunes : responseItunes
-        })
         console.log('Checkout this JSON! ', out);
-    });
+    })
+    .catch(
+        firebase.database().ref('books/' + searchIsbn + '/itunes/').set("No disponible en iTunes")
+    );;
     if(store.getState().itunes != null ){
-        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(responseItunes);
+        firebase.database().ref('books/' + searchIsbn + '/itunes/').set(responseItunes);
         console.log('price2', store.getState().itunes);
     }
 }
 
-export async function searchGoogleBooks () {
-    let isbn = store.getState().isbn;
+export async function searchGoogleBooks (searchIsbn) {
+    let isbn = searchIsbn;
     let url = `https://www.googleapis.com/books/v1/volumes?q=search+${isbn}`;
     let responseGoogle;
     await fetch(url)
     .then(res => res.json())
     .then((out) => {
-        if (out.items){
+        if (out.items) {
             responseGoogle = {
                 price : out.items[0].saleInfo.listPrice.amount,
                 img : out.items[0].volumeInfo.imageLinks.thumbnail,
@@ -55,25 +61,20 @@ export async function searchGoogleBooks () {
                 description : out.items[0].searchInfo.textSnippet, 
                 ituneUrl : out.items[0].saleInfo.buyLink, 
             }
-            store.setState({
-                googleBooks : responseGoogle
-            })
-        } else {
-            firebase.database().ref('books/' + store.getState().isbn + '/google/').set("No disponible en Google")
         }
         console.log('Checkout this JSON! ', out);
     })
     .catch(
-        firebase.database().ref('books/' + store.getState().isbn + '/google/').set("No disponible en Google")
+        firebase.database().ref('books/' + searchIsbn + '/google/').set("No disponible en Google")
     );
     if(store.getState().googleBooks != null ){
-        firebase.database().ref('books/' + store.getState().isbn + '/google/').set(responseGoogle);
+        firebase.database().ref('books/' + searchIsbn + '/google/').set(responseGoogle);
         console.log('pricegoogle', store.getState().googleBooks);
     }
 }
 
-export const getBooks = () => {
-    database.ref ('books/' + store.getState().isbn).once ('value').then ( res => {
+export const getBooks = (searchIsbn) => {
+    database.ref ('books/' + searchIsbn).once ('value').then ( res => {
         const getFullInfo = res.val(); 
         console.log ('full info ', getFullInfo);
         store.setState ({
@@ -82,12 +83,15 @@ export const getBooks = () => {
             google : getFullInfo.google,          
           }
         });
-        console.log("SIuser", store.getState().book);
+        console.log("storeBooks", store.getState().book);
     })
     .catch(
         search()
     );
 }
+
+
+
 
 
 

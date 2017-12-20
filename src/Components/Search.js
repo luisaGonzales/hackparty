@@ -5,25 +5,25 @@ import {Form, FormGroup, Col, Button, FormControl} from 'react-bootstrap';
 export const Search = () => {
     const onSubmit = (e) => {
         e.preventDefault();
-        if(this.isbnSearch.value) {
-            console.log(this.isbnSearch.value);
-            saveIsbn(this.isbnSearch.value);
-        }
+        // if(this.isbnSearch.value) {
+        //     console.log(this.isbnSearch.value);
+        //     saveIsbn(this.isbnSearch.value);
+        // }
     } 
     return (
         <Form horizontal onSubmit={onSubmit}>
+
             <FormGroup controlId="formHorizontalPassword">
-                <Col smOffset={4} sm={4}>
+                <Col mdOffset={4} md={4}>
                     <FormControl type="text" placeholder="Text ISBN" autoComplete="none" inputRef={ref => { this.isbnSearch = ref }}/>
                 </Col>
-            </FormGroup>
-            <FormGroup>
-                <Col smOffset={4} sm={4}>
+                <Col md={4}>
                     <Button type="submit" className="btnSubmit">
                         SearchItunes
                     </Button>
                 </Col>
             </FormGroup>
+            <br/><br/>
             <Button onClick={()=>{search()}} className="btnSubmit">
                         searchAll
                     </Button>

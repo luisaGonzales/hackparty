@@ -1,8 +1,11 @@
 import createStore from 'redux-zero';
 
 const initialState = {
-    title : "Hackaparty"
+    title : "Hackparty", 
+    isbn : null, 
+    book : null,
 }
 
 const store = createStore(initialState);
 export default store;
+

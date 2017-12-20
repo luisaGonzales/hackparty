@@ -6,16 +6,21 @@ export const saveIsbn = (isbn) => {
         isbn : parseInt(isbn)
     });
     getBooks();
-    console.log("arr", store.getState().arr);
+    console.log("arr", store.getState().arr.length);
+
 }
 
 export const search = () => {
-    searchItunes();
-    searchGoogleBooks();
+
+    store.getState().arr.map((isbn) => {
+        searchItunes(isbn);
+        searchGoogleBooks(isbn);
+    })
+ 
 }
 
-export async function searchItunes () {
-    let isbn = store.getState().isbn;
+export async function searchItunes (searchIsbn) {
+    let isbn = searchIsbn;
     let url = `https://itunes.apple.com/lookup?isbn=${isbn}`;
     let responseItunes;
     await fetch(url)
@@ -32,16 +37,16 @@ export async function searchItunes () {
         console.log('Checkout this JSON! ', out);
     })
     .catch(
-        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set("No disponible en iTunes")
+        firebase.database().ref('books/' + searchIsbn + '/itunes/').set("No disponible en iTunes")
     );;
     if(store.getState().itunes != null ){
-        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(responseItunes);
+        firebase.database().ref('books/' + searchIsbn + '/itunes/').set(responseItunes);
         console.log('price2', store.getState().itunes);
     }
 }
 
-export async function searchGoogleBooks () {
-    let isbn = store.getState().isbn;
+export async function searchGoogleBooks (searchIsbn) {
+    let isbn = searchIsbn;
     let url = `https://www.googleapis.com/books/v1/volumes?q=search+${isbn}`;
     let responseGoogle;
     await fetch(url)
@@ -60,16 +65,16 @@ export async function searchGoogleBooks () {
         console.log('Checkout this JSON! ', out);
     })
     .catch(
-        firebase.database().ref('books/' + store.getState().isbn + '/google/').set("No disponible en Google")
+        firebase.database().ref('books/' + searchIsbn + '/google/').set("No disponible en Google")
     );
     if(store.getState().googleBooks != null ){
-        firebase.database().ref('books/' + store.getState().isbn + '/google/').set(responseGoogle);
+        firebase.database().ref('books/' + searchIsbn + '/google/').set(responseGoogle);
         console.log('pricegoogle', store.getState().googleBooks);
     }
 }
 
-export const getBooks = () => {
-    database.ref ('books/' + store.getState().isbn).once ('value').then ( res => {
+export const getBooks = (searchIsbn) => {
+    database.ref ('books/' + searchIsbn).once ('value').then ( res => {
         const getFullInfo = res.val(); 
         console.log ('full info ', getFullInfo);
         store.setState ({
@@ -84,6 +89,9 @@ export const getBooks = () => {
         search()
     );
 }
+
+
+
 
 
 

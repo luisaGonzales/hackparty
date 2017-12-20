@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {saveIsbn} from '../Actions/Actions';
+import {saveIsbn, search} from '../Actions/Actions';
 import {Form, FormGroup, Col, Button, FormControl} from 'react-bootstrap';
 
 export const Search = () => {
@@ -24,6 +24,9 @@ export const Search = () => {
                     </Button>
                 </Col>
             </FormGroup>
+            <Button onClick={()=>{search()}} className="btnSubmit">
+                        searchAll
+                    </Button>
         </Form>
     );
 }

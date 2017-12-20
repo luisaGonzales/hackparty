@@ -3,6 +3,7 @@ import './App.css';
 import {connect} from 'redux-zero/react';
 import {Search} from './Components/Search';
 import {Book} from './Components/Book';
+import {Form} from './Components/Form';
 
 const App = ({title, itunes}) => {
   return(
@@ -13,7 +14,6 @@ const App = ({title, itunes}) => {
         itunes !=null && 
         <Book title={itunes.title} price={itunes.price} />
       }
-      
     </div>
   );
 }

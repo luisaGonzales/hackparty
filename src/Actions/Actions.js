@@ -1,4 +1,5 @@
 import store from '../Store/Store';
+import firebase, {auth, database} from './Firebase.js';
 
 export async function searchItunes () {
     let isbn = store.getState().isbn;
@@ -21,6 +22,7 @@ export async function searchItunes () {
         console.log('Checkout this JSON! ', out);
     });
     if(store.getState().itunes != null ){
+        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(store.getState().itunes);
         console.log('price2', store.getState().itunes);
     }
 }

@@ -6,6 +6,7 @@ export const saveIsbn = (isbn) => {
         isbn : parseInt(isbn)
     });
     getBooks();
+    console.log("arr", store.getState().arr);
 }
 
 export const search = () => {

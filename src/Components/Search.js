@@ -5,10 +5,10 @@ import {Form, FormGroup, Col, Button, FormControl} from 'react-bootstrap';
 export const Search = () => {
     const onSubmit = (e) => {
         e.preventDefault();
-        // if(this.isbnSearch.value) {
-        //     console.log(this.isbnSearch.value);
-        //     saveIsbn(this.isbnSearch.value);
-        // }
+        if(this.isbnSearch.value) {
+            console.log(this.isbnSearch.value);
+            saveIsbn(this.isbnSearch.value);
+        }
     } 
     return (
         <Form horizontal onSubmit={onSubmit}>

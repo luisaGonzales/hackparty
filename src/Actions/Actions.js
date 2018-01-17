@@ -21,23 +21,26 @@ export async function searchItunes () {
     await fetch(url)
     .then(res => res.json())
     .then((out) => {
-        responseItunes = {
-            price : out.results[0].price,
-            img : out.results[0].artworkUrl100,
-            title : out.results[0].trackCensoredName,
-            author : out.results[0].artistName,
-            description : out.results[0].description, 
-            ituneUrl : out.results[0].trackViewUrl 
+        if(out.results[0] != null || out.results[0] != undefined ) {
+            responseItunes = {
+                price : out.results[0].price,
+                img : out.results[0].artworkUrl100,
+                title : out.results[0].trackCensoredName,
+                author : out.results[0].artistName,
+                description : out.results[0].description, 
+                ituneUrl : out.results[0].trackViewUrl 
+            }
+            console.log('Checkout itunes ', out);
+            firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(responseItunes);
         }
-        console.log('Checkout this JSON! ', out);
     })
-    .catch(
-        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set("No disponible en iTunes")
-    );;
-    if(store.getState().itunes != null ){
-        firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(responseItunes);
-        console.log('price2', store.getState().itunes);
-    }
+    // .catch(
+    //     firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set("No disponible en iTunes")
+    // );
+    // if(store.getState().itunes != null ){
+    //     firebase.database().ref('books/' + store.getState().isbn + '/itunes/').set(responseItunes);
+    //     console.log('price2', store.getState().itunes);
+    // }
 }
 
 export async function searchGoogleBooks () {
@@ -47,7 +50,7 @@ export async function searchGoogleBooks () {
     await fetch(url)
     .then(res => res.json())
     .then((out) => {
-        if (out.items) {
+        if (out.items[0]) {
             responseGoogle = {
                 price : out.items[0].saleInfo.listPrice.amount,
                 img : out.items[0].volumeInfo.imageLinks.thumbnail,
@@ -58,14 +61,15 @@ export async function searchGoogleBooks () {
             }
         }
         console.log('Checkout this JSON! ', out);
+        firebase.database().ref('books/' + store.getState().isbn + '/google/').set(responseGoogle);
     })
     .catch(
         firebase.database().ref('books/' + store.getState().isbn + '/google/').set("No disponible en Google")
     );
-    if(store.getState().googleBooks != null ){
-        firebase.database().ref('books/' + store.getState().isbn + '/google/').set(responseGoogle);
-        console.log('pricegoogle', store.getState().googleBooks);
-    }
+    // if(store.getState().googleBooks != null ){
+    //     firebase.database().ref('books/' + store.getState().isbn + '/google/').set(responseGoogle);
+    //     console.log('pricegoogle', store.getState().googleBooks);
+    // }
 }
 
 export const getBooks = () => {
